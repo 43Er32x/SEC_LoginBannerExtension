@@ -1,14 +1,3 @@
-// Fonction pour vérifier si la page contient un champ de mot de passe
-function containsPasswordInput() {
-    var passwordInputs = document.querySelectorAll('input[type="password"]');
-    return passwordInputs.length > 0;
-}
-
-// Fonction pour vérifier si l'URL contient des mots clés de pages de connexion ou d'inscription
-function isLoginPageURL(url) {
-    return url.includes('/login') || url.includes('/signin') || url.includes('/register') || url.includes('/signup');
-}
-
 // Liste blanche de domaines autorisés avec sous-domaines
 const whiteList = [
     'spotify.com',
@@ -29,6 +18,16 @@ function isInWhiteList(hostname) {
     return false;
 }
 
+// Fonction pour détecter la langue
+function detectLanguage() {
+    const userLanguage = navigator.language;
+    if (userLanguage.startsWith('en')) {
+        return 'en';
+    }
+    // Par défaut, retourne 'fr' pour le français
+    return 'fr';
+}
+
 // Obtenir l'URL actuelle
 const currentURL = window.location.href;
 
@@ -36,19 +35,8 @@ const currentURL = window.location.href;
 const hostname = window.location.hostname;
 const isWhiteListed = isInWhiteList(hostname);
 
-// Obtenir la langue du navigateur
-const userLanguage = navigator.language;
-
-// Texte par défaut en français
-let bannerText = "<br><strong>Attention :</strong> Vous êtes sur une page qui demande des identifiants. <br><strong>Merci de ne jamais saisir vos identifiants de l'entreprise sur des sites externes.</strong> <br>Vérifiez toujours l'URL du site et assurez-vous de sa légitimité avant de saisir des informations sensibles.<br><br>";
-
-// Vérifier si la langue est l'anglais et traduire le texte
-if (userLanguage.startsWith('en')) {
-    bannerText = "<br><strong>Attention:</strong> You are on a page requesting credentials. <br><strong>Please never enter your company credentials on external sites.</strong> <br>Always verify the site's URL and ensure its legitimacy before entering sensitive information.<br><br>";
-}
-
 // Vérifier si la page contient un champ de mot de passe ou si c'est une page de connexion ou d'inscription
-if (!isWhiteListed && (containsPasswordInput() || isLoginPageURL(currentURL))) {
+if (!isWhiteListed && (document.querySelector('input[type="password"]') || /\/(?:login|signin|register|signup)/i.test(currentURL))) {
     // Créer une bannière rouge
     var redBanner = document.createElement('div');
     redBanner.style.backgroundColor = 'red';
@@ -68,27 +56,66 @@ if (!isWhiteListed && (containsPasswordInput() || isLoginPageURL(currentURL))) {
     logoImg.style.height = '78px'; // Définir la hauteur du logo
     redBanner.appendChild(logoImg); // Ajouter le logo à la bannière
 
+    // Texte par défaut en français
+    let bannerText = "<br><strong>Attention :</strong> Vous êtes sur une page qui demande des identifiants. <br><strong>Merci de ne jamais saisir vos identifiants de l'entreprise sur des sites externes.</strong> <br>Vérifiez toujours l'URL du site et assurez-vous de sa légitimité avant de saisir des informations sensibles.<br><br>";
+
+    // Détection de la langue
+    const language = detectLanguage();
+    if (language === 'en') {
+        // Texte en anglais
+        bannerText = "<br><strong>Attention:</strong> You are on a page requesting credentials. <br><strong>Please never enter your company credentials on external sites.</strong> <br>Always verify the site's URL and ensure its legitimacy before entering sensitive information.<br><br>";
+    }
+
     // Créer le texte dans la bannière
     var bannerTextElement = document.createElement('div');
     bannerTextElement.innerHTML = bannerText;
     redBanner.appendChild(bannerTextElement); // Ajouter le texte à la bannière
 
-    // Créer un bouton de fermeture
-    var closeButton = document.createElement('button');
-    closeButton.textContent = 'Ok';
-    closeButton.style.backgroundColor = 'transparent';
-    closeButton.style.color = 'white';
-    closeButton.style.border = '1px solid white'; // Ajouter une bordure autour du bouton
-    closeButton.style.cursor = 'pointer';
-    closeButton.style.float = 'center';
-    closeButton.addEventListener('click', function() {
-    redBanner.style.display = 'none';
-});
+    // Créer un conteneur pour les boutons
+    var buttonContainer = document.createElement('div');
+    buttonContainer.style.display = 'flex';
+    buttonContainer.style.justifyContent = 'center';
+    redBanner.appendChild(buttonContainer);
 
-// Ajouter le bouton de fermeture à la bannière
-redBanner.appendChild(closeButton);
+    // Créer le bouton de saut
+    var skipButton = document.createElement('button');
+    skipButton.textContent = 'Ok';
+    skipButton.style.backgroundColor = 'transparent';
+    skipButton.style.color = 'white';
+    skipButton.style.border = '1px solid white'; // Ajouter une bordure autour du bouton
+    skipButton.style.cursor = 'pointer';
+    skipButton.style.marginRight = '10px';
+    skipButton.addEventListener('click', function() {
+        redBanner.style.display = 'none';
+    });
 
+    // Créer le bouton OK
+    var okButton = document.createElement('button');
+    okButton.textContent = 'Whitelist 24h';
+    okButton.style.backgroundColor = 'transparent';
+    okButton.style.color = 'white';
+    okButton.style.border = '1px solid white'; // Ajouter une bordure autour du bouton
+    okButton.style.cursor = 'pointer';
+    okButton.addEventListener('click', function() {
+        redBanner.style.display = 'none';
 
-    // Ajouter la bannière à la page
-    document.body.appendChild(redBanner);
+        // Enregistrer l'heure de la fermeture de la bannière dans le stockage local
+        const storageKey = 'bannerCooldown_' + hostname;
+        localStorage.setItem(storageKey, Date.now());
+    });
+
+    // Ajouter les boutons au conteneur
+    buttonContainer.appendChild(skipButton);
+    buttonContainer.appendChild(okButton);
+
+    // Vérifier si le cooldown est expiré pour le site actuel
+    const storageKey = 'bannerCooldown_' + hostname;
+    const lastCloseTime = localStorage.getItem(storageKey);
+    const cooldownExpiration = lastCloseTime ? parseInt(lastCloseTime) + (24 * 60 * 60 * 1000) : 0; // Ajouter 24 heures
+
+    if (!lastCloseTime || Date.now() >= cooldownExpiration) {
+        // Ajouter la bannière à la page si le cooldown est expiré
+        document.body.appendChild(redBanner);
+    }
 }
+
