@@ -2,3 +2,4 @@ google.com
 facebook.com
 youtube.com
 wikipedia.org
+fandom.com
