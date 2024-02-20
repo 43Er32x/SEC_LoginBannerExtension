@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Logon Banner Extension",
-    "version": "1.0",
+    "version": "1.1",
     "description": "Web extension displaying a warning banner on login pages and maintaining a whitelist of allowed domains.",
     "permissions": [
       "activeTab"
