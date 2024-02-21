@@ -1,4 +1,4 @@
-// MODIF HERE: Élargissement de l'objet de traductions pour inclure l'anglais
+// Objets de traduction pour les textes affichés dans la bannière
 const translations = {
     'fr': {
         bannerText: "<strong>Attention :</strong> Vous êtes sur une page qui demande des identifiants. <br><strong>Merci de ne jamais saisir vos identifiants de l'entreprise sur des sites externes.</strong> <br>Vérifiez toujours l'URL du site et assurez-vous de sa légitimité avant de saisir des informations sensibles.",
@@ -10,10 +10,8 @@ const translations = {
         okButton: 'OK',
         whitelistButton: 'Whitelist 24h'
     },
-    // Vous pouvez ajouter d'autres langues ici
 };
 
-// MODIF HERE: Détection de la langue du navigateur et choix de la traduction appropriée ou anglais par défaut
 const browserLang = navigator.language.slice(0, 2); // Récupère les deux premiers caractères de la langue du navigateur
 const currentLang = translations[browserLang] ? browserLang : 'en'; // Utilise l'anglais si aucune traduction n'est disponible pour la langue du navigateur
 
@@ -58,111 +56,56 @@ async function getWhiteList() {
 
 function createBanner() {
     const banner = document.createElement('div');
-    banner.style.backgroundColor = '#7F0000';
-    banner.style.color = 'white';
-    banner.style.width = '100%';
-    banner.style.height = 'flex';
-    banner.style.position = 'fixed';
-    banner.style.top = '0';
-    banner.style.left = '0';
-    banner.style.zIndex = '9999';
-    banner.style.display = 'flex';
-    banner.style.flexDirection = 'column';
-    banner.style.alignItems = 'center';
-    banner.style.borderBottom = '1px solid black';
+    banner.style.cssText = 'background-color: #7F0000 !important; color: white !important; width: 100% !important; position: fixed !important; top: 0 !important; left: 0 !important; z-index: 9999 !important; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; padding: 10px 0 !important; font-family: Arial, sans-serif !important; font-size: 16px !important; line-height: 1.5 !important; border-bottom: 1px solid black !important;';
 
     const logoImg = document.createElement('img');
     logoImg.src = 'https://i.ibb.co/NjZkWJB/logo.png';
     logoImg.alt = 'Logo';
-    logoImg.style.height = '80px';
-    logoImg.style.marginTop = '10px';
+    logoImg.style.cssText = 'height: 80px !important; margin: 10px 0 !important;';
     banner.appendChild(logoImg);
-
-    const spaceLogoToText = document.createElement('div');
-    spaceLogoToText.style.height = '20px';
-    banner.appendChild(spaceLogoToText);
 
     const bannerText = document.createElement('p');
     bannerText.innerHTML = translations[currentLang].bannerText;
-    bannerText.style.textAlign = 'center';
+    bannerText.style.cssText = 'text-align: center !important; margin: 10px 20px !important;';
     banner.appendChild(bannerText);
 
     const buttonContainer = document.createElement('div');
-    buttonContainer.style.display = 'flex';
-    buttonContainer.style.flexDirection = 'flex';
-    buttonContainer.style.gap = '10px';
-    banner.appendChild(buttonContainer);
-
-    const spaceTextToButtons = document.createElement('div');
-    spaceTextToButtons.style.height = '20px';
-    buttonContainer.appendChild(spaceTextToButtons);
-
+    buttonContainer.style.cssText = 'display: flex !important; gap: 10px !important; flex-wrap: wrap !important; justify-content: center !important; margin-top: 20px !important;';
+    
     const okButton = document.createElement('button');
     okButton.textContent = translations[currentLang].okButton;
-    okButton.style.backgroundColor = 'transparent';
-    okButton.style.color = 'white';
-    okButton.style.border = '1px solid white';
-    okButton.style.borderRadius = '20px';
-    okButton.style.padding = '10px 20px';
-    okButton.style.cursor = 'pointer';
-    okButton.addEventListener('mouseenter', function() {
-        okButton.style.backgroundColor = 'white';
-        okButton.style.color = '#7F0000';
-    });
-    okButton.addEventListener('mouseleave', function() {
-        okButton.style.backgroundColor = 'transparent';
-        okButton.style.color = 'white';
-    });
-    okButton.addEventListener('click', function() {
-        banner.style.display = 'none';
-    });
-    buttonContainer.appendChild(okButton);
+    okButton.style.cssText = 'background-color: #7F0000 !important; color: white !important; border: 1px solid white !important; border-radius: 20px !important; padding: 10px 20px !important; cursor: pointer !important; font-family: Arial, sans-serif !important; font-size: 14px !important;';
+    okButton.onclick = function() { banner.style.display = 'none'; };
+    okButton.onmouseenter = function() { this.style.backgroundColor = 'white'; this.style.color = '#7F0000'; };
+    okButton.onmouseleave = function() { this.style.backgroundColor = '#7F0000'; this.style.color = 'white'; };
 
     const whitelistButton = document.createElement('button');
     whitelistButton.textContent = translations[currentLang].whitelistButton;
-    whitelistButton.style.backgroundColor = 'transparent';
-    whitelistButton.style.color = 'white';
-    whitelistButton.style.border = '1px solid white';
-    whitelistButton.style.borderRadius = '20px';
-    whitelistButton.style.padding = '10px 20px';
-    whitelistButton.style.cursor = 'pointer';
-    whitelistButton.addEventListener('mouseenter', function() {
-        whitelistButton.style.backgroundColor = 'white';
-        whitelistButton.style.color = '#7F0000';
-    });
-    whitelistButton.addEventListener('mouseleave', function() {
-        whitelistButton.style.backgroundColor = 'transparent';
-        whitelistButton.style.color = 'white';
-    });
-    whitelistButton.addEventListener('click', function() {
-        banner.style.display = 'none';
-        localStorage.setItem('bannerCooldown', Date.now());
-    });
+    whitelistButton.style.cssText = 'background-color: #7F0000 !important; color: white !important; border: 1px solid white !important; border-radius: 20px !important; padding: 10px 20px !important; cursor: pointer !important; font-family: Arial, sans-serif !important; font-size: 14px !important;';
+    whitelistButton.onclick = function() { banner.style.display = 'none'; localStorage.setItem('bannerCooldown', Date.now()); };
+    whitelistButton.onmouseenter = function() { this.style.backgroundColor = 'white'; this.style.color = '#7F0000'; };
+    whitelistButton.onmouseleave = function() { this.style.backgroundColor = '#7F0000'; this.style.color = 'white'; };
+    
+    buttonContainer.appendChild(okButton);
     buttonContainer.appendChild(whitelistButton);
-
-    const spaceButtonsToBottom = document.createElement('div');
-    spaceButtonsToBottom.style.height = '20px';
-    banner.appendChild(spaceButtonsToBottom);
+    banner.appendChild(buttonContainer);
 
     document.body.appendChild(banner);
 }
 
 function isPasswordFieldPresent() {
-    const passwordFields = document.querySelectorAll('input[type="password"]');
-    return passwordFields.length > 0;
+    return document.querySelectorAll('input[type="password"]').length > 0;
 }
 
-const currentURL = window.location.href;
-const whitelistCheck = async () => {
+async function checkAndDisplayBanner() {
     const whiteList = await getWhiteList();
-    if (!isInWhiteList(window.location.hostname, whiteList) && (/\/(?:login|signin|register|signup)/i.test(currentURL) || isPasswordFieldPresent())) {
+    if (!isInWhiteList(window.location.hostname, whiteList) && (/\/(?:login|signin|register|signup)/i.test(window.location.href) || isPasswordFieldPresent())) {
         const bannerCooldown = parseInt(localStorage.getItem('bannerCooldown'));
         const cooldownExpiration = bannerCooldown ? bannerCooldown + (24 * 60 * 60 * 1000) : 0;
         if (!bannerCooldown || Date.now() >= cooldownExpiration) {
             createBanner();
         }
     }
-};
+}
 
-whitelistCheck();
-
+checkAndDisplayBanner();
