@@ -55,7 +55,7 @@ function detectLanguage() {
 function createBanner() {
     const banner = document.createElement('div');
     banner.style.backgroundColor = '#7F0000';
-    banner.style.color = 'white';
+    banner.style.color = 'white'; // Changement de la couleur du texte en blanc
     banner.style.width = '100%'; // La bannière occupe toute la largeur de la page
     banner.style.height = 'flex'; // La bannière occupe 10% de la hauteur de la page
     banner.style.position = 'fixed';
@@ -65,14 +65,21 @@ function createBanner() {
     banner.style.display = 'flex';
     banner.style.flexDirection = 'column'; // Affichage en colonne
     banner.style.alignItems = 'center'; // Centrer horizontalement
-    banner.style.padding = '10px 20px'; // Ajouter des marges
+    banner.style.borderBottom = '1px solid black'; // Ajout de la bordure noire en bas
+
 
     // Création du logo
     const logoImg = document.createElement('img');
     logoImg.src = 'https://i.ibb.co/NjZkWJB/logo.png'; // Remplacez par l'URL de votre logo
     logoImg.alt = 'Logo'; // Texte alternatif pour l'accessibilité
     logoImg.style.height = '80px'; // Hauteur du logo
+    logoImg.style.marginTop = '10px'; // Ajout de la marge au logo
     banner.appendChild(logoImg); // Ajouter le logo à la bannière
+
+    // Espace entre le logo et le texte de la bannière
+    const spaceLogoToText = document.createElement('div');
+    spaceLogoToText.style.height = '20px'; // Espace entre le logo et le texte
+    banner.appendChild(spaceLogoToText);
 
     // Texte de la bannière
     const bannerText = document.createElement('p');
@@ -83,8 +90,14 @@ function createBanner() {
     // Conteneur pour les boutons
     const buttonContainer = document.createElement('div');
     buttonContainer.style.display = 'flex';
+    buttonContainer.style.flexDirection = 'flex'; // Affichage des boutons en colonne
     buttonContainer.style.gap = '10px'; // Espacement entre les boutons
     banner.appendChild(buttonContainer);
+
+    // Espace entre le texte et les boutons
+    const spaceTextToButtons = document.createElement('div');
+    spaceTextToButtons.style.height = '20px'; // Ajustez la hauteur de l'espace ici
+    buttonContainer.appendChild(spaceTextToButtons);
 
     // Bouton Ok
     const okButton = document.createElement('button');
@@ -95,6 +108,15 @@ function createBanner() {
     okButton.style.borderRadius = '20px';
     okButton.style.padding = '10px 20px';
     okButton.style.cursor = 'pointer';
+    // Ajout de l'effet de surbrillance sur le bouton Ok
+    okButton.addEventListener('mouseenter', function() {
+        okButton.style.backgroundColor = 'white';
+        okButton.style.color = '#7F0000';
+    });
+    okButton.addEventListener('mouseleave', function() {
+        okButton.style.backgroundColor = 'transparent';
+        okButton.style.color = 'white';
+    });
     okButton.addEventListener('click', function() {
         banner.style.display = 'none';
     });
@@ -109,6 +131,15 @@ function createBanner() {
     whitelistButton.style.borderRadius = '20px';
     whitelistButton.style.padding = '10px 20px';
     whitelistButton.style.cursor = 'pointer';
+    // Ajout de l'effet de surbrillance sur le bouton Whitelist 24h
+    whitelistButton.addEventListener('mouseenter', function() {
+        whitelistButton.style.backgroundColor = 'white';
+        whitelistButton.style.color = '#7F0000';
+    });
+    whitelistButton.addEventListener('mouseleave', function() {
+        whitelistButton.style.backgroundColor = 'transparent';
+        whitelistButton.style.color = 'white';
+    });
     whitelistButton.addEventListener('click', function() {
         banner.style.display = 'none';
         // Enregistrer l'heure de la fermeture de la bannière dans le stockage local
@@ -117,16 +148,32 @@ function createBanner() {
     });
     buttonContainer.appendChild(whitelistButton);
 
+    // Espace entre les boutons et la bordure inférieure
+    const spaceButtonsToBottom = document.createElement('div');
+    spaceButtonsToBottom.style.height = '20px'; // Ajustez la hauteur de l'espace ici
+    banner.appendChild(spaceButtonsToBottom);
+
     // Ajouter la bannière à la page
     document.body.appendChild(banner);
 }
 
+// Fonction pour vérifier si un champ de mot de passe est présent sur la page
+function isPasswordFieldPresent() {
+    const passwordFields = document.querySelectorAll('input[type="password"]');
+    return passwordFields.length > 0;
+}
+
 // Vérifier si la bannière doit être affichée
 const currentURL = window.location.href;
-if (!/\/(?:login|signin|register|signup)/i.test(currentURL)) {
-    const bannerCooldown = parseInt(localStorage.getItem('bannerCooldown'));
-    const cooldownExpiration = bannerCooldown ? bannerCooldown + (24 * 60 * 60 * 1000) : 0; // Ajouter 24 heures
-    if (!bannerCooldown || Date.now() >= cooldownExpiration) {
-        createBanner();
+const whitelistCheck = async () => {
+    const whiteList = await getWhiteList();
+    if (!isInWhiteList(window.location.hostname, whiteList) && (/\/(?:login|signin|register|signup)/i.test(currentURL) || isPasswordFieldPresent())) {
+        const bannerCooldown = parseInt(localStorage.getItem('bannerCooldown'));
+        const cooldownExpiration = bannerCooldown ? bannerCooldown + (24 * 60 * 60 * 1000) : 0; // Ajouter 24 heures
+        if (!bannerCooldown || Date.now() >= cooldownExpiration) {
+            createBanner();
+        }
     }
-}
+};
+
+whitelistCheck();
