@@ -66,7 +66,7 @@ function createBanner() {
 
     const bannerText = document.createElement('p');
     bannerText.innerHTML = translations[currentLang].bannerText;
-    bannerText.style.cssText = 'text-align: center !important; margin: 10px 20px !important;';
+    bannerText.style.cssText = 'text-align: center !important; margin: 10px 20px !important; color: white !important;'; // Force la couleur du texte à blanc
     banner.appendChild(bannerText);
 
     const buttonContainer = document.createElement('div');
@@ -109,3 +109,4 @@ async function checkAndDisplayBanner() {
 }
 
 checkAndDisplayBanner();
+
