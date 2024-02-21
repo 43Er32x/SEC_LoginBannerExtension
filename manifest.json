@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Logon red banner",
+  "name": "SEC_LoginBannerExtension",
   "version": "1.0",
   "description": "Alert banner extension",
   "content_scripts": [
