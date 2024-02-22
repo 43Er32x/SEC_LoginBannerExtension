@@ -7,3 +7,4 @@ cgtrader.com
 ovh.com
 spotify.com
 apple.com
+microsoft.com
